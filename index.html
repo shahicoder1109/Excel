@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Excel O'qitish Rejasi</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --surface: #1a1a1a;
+    --surface2: #222222;
+    --border: #2e2e2e;
+    --text: #e8e8e8;
+    --muted: #888;
+    --green: #22c55e;
+    --yellow: #eab308;
+    --orange: #f97316;
+    --blue: #3b82f6;
+    --purple: #a855f7;
+    --red: #ef4444;
+    --accent: #22c55e;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding: 0 0 80px;
+  }
+
+  /* HEADER */
+  .hero {
+    background: linear-gradient(135deg, #0f0f0f 0%, #1a2f1a 50%, #0f0f0f 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 50px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute;
+    top: -100px; right: -100px;
+    width: 400px; height: 400px;
+    background: radial-gradient(circle, rgba(34,197,94,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .hero::after {
+    content: '⚡';
+    position: absolute;
+    bottom: 20px; right: 40px;
+    font-size: 80px;
+    opacity: 0.05;
+  }
+
+  .badge {
+    display: inline-block;
+    background: rgba(34,197,94,0.15);
+    color: var(--green);
+    border: 1px solid rgba(34,197,94,0.3);
+    padding: 4px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+  }
+
+  .hero h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(36px, 6vw, 64px);
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 16px;
+    background: linear-gradient(135deg, #fff 0%, #22c55e 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero p {
+    color: var(--muted);
+    font-size: 16px;
+    max-width: 560px;
+    line-height: 1.7;
+    margin-bottom: 30px;
+  }
+
+  .stats {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  .stat {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 12px 20px;
+    text-align: center;
+  }
+  .stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--green);
+    display: block;
+  }
+  .stat-label {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  /* MAIN */
+  .container {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+
+  /* PROGRESS */
+  .progress-section {
+    padding: 32px 0 0;
+  }
+  .section-label {
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+  .progress-bar-wrap {
+    background: var(--surface);
+    border-radius: 100px;
+    height: 8px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--green), #86efac);
+    border-radius: 100px;
+    width: 0%;
+    transition: width 1s ease;
+  }
+  .progress-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+
+  /* PHASES */
+  .phases {
+    margin-top: 48px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .phase {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    overflow: hidden;
+    transition: border-color 0.2s;
+  }
+  .phase:hover { border-color: #444; }
+  .phase.active { border-color: var(--accent); }
+
+  .phase-header {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 20px 24px;
+    cursor: pointer;
+    user-select: none;
+  }
+
+  .phase-icon {
+    width: 44px; height: 44px;
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px;
+    flex-shrink: 0;
+  }
+
+  .phase-meta { flex: 1; }
+  .phase-title {
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 4px;
+  }
+  .phase-sub {
+    font-size: 13px;
+    color: var(--muted);
+  }
+
+  .phase-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .phase-duration {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 12px;
+    color: var(--muted);
+    white-space: nowrap;
+  }
+
+  .chevron {
+    color: var(--muted);
+    font-size: 18px;
+    transition: transform 0.3s;
+  }
+  .phase.open .chevron { transform: rotate(90deg); }
+
+  .phase-body {
+    display: none;
+    padding: 0 24px 24px;
+    border-top: 1px solid var(--border);
+  }
+  .phase.open .phase-body { display: block; }
+
+  /* LESSONS */
+  .lessons { margin-top: 16px; display: flex; flex-direction: column; gap: 8px; }
+
+  .lesson {
+    display: flex;
+    align-items: flex-start;
+    gap: 14px;
+    padding: 14px 16px;
+    background: var(--surface2);
+    border-radius: 10px;
+    border: 1px solid transparent;
+    transition: border-color 0.2s, background 0.2s;
+    cursor: pointer;
+  }
+  .lesson:hover {
+    border-color: var(--border);
+    background: #272727;
+  }
+  .lesson.done {
+    opacity: 0.5;
+  }
+
+  .lesson-check {
+    width: 22px; height: 22px;
+    border-radius: 6px;
+    border: 2px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+    margin-top: 1px;
+    transition: all 0.2s;
+    font-size: 12px;
+  }
+  .lesson.done .lesson-check {
+    background: var(--green);
+    border-color: var(--green);
+    color: #000;
+  }
+
+  .lesson-info { flex: 1; }
+  .lesson-name {
+    font-size: 14px;
+    font-weight: 500;
+    margin-bottom: 4px;
+  }
+  .lesson-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  .lesson-tags {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+    margin-top: 8px;
+  }
+  .tag {
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+
+  /* TIP BOX */
+  .tip-box {
+    margin-top: 16px;
+    background: rgba(34,197,94,0.08);
+    border: 1px solid rgba(34,197,94,0.2);
+    border-radius: 10px;
+    padding: 14px 16px;
+    font-size: 13px;
+    color: #86efac;
+    line-height: 1.6;
+  }
+  .tip-box strong { color: var(--green); }
+
+  /* PHASE COLORS */
+  .c-green { background: rgba(34,197,94,0.15); color: var(--green); }
+  .c-yellow { background: rgba(234,179,8,0.15); color: var(--yellow); }
+  .c-orange { background: rgba(249,115,22,0.15); color: var(--orange); }
+  .c-blue { background: rgba(59,130,246,0.15); color: var(--blue); }
+  .c-purple { background: rgba(168,85,247,0.15); color: var(--purple); }
+
+  .t-green { background: rgba(34,197,94,0.1); color: var(--green); }
+  .t-yellow { background: rgba(234,179,8,0.1); color: var(--yellow); }
+  .t-orange { background: rgba(249,115,22,0.1); color: var(--orange); }
+  .t-blue { background: rgba(59,130,246,0.1); color: var(--blue); }
+  .t-purple { background: rgba(168,85,247,0.1); color: var(--purple); }
+  .t-muted { background: rgba(255,255,255,0.06); color: var(--muted); }
+
+  /* FOOTER NOTE */
+  .footer-note {
+    margin-top: 48px;
+    text-align: center;
+    font-size: 13px;
+    color: var(--muted);
+  }
+  .footer-note span { color: var(--green); }
+
+  /* Scrollbar */
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg); }
+  ::-webkit-scrollbar-thumb { background: #333; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="badge" style="font-size:15px; padding: 8px 22px; letter-spacing:0.5px;">👩‍🏫 Erkinjonova Shohida</div>
+  <h1>Excel<br>O'qitish Rejasi</h1>
+  <p>Noldan professional darajagacha — 5 bosqich, amaliy mashqlar va har dars uchun tayyor materiallar.</p>
+  <div class="stats">
+    <div class="stat"><span class="stat-num">5</span><span class="stat-label">Bosqich</span></div>
+    <div class="stat"><span class="stat-num">7</span><span class="stat-label">Hafta</span></div>
+    <div class="stat"><span class="stat-num">28+</span><span class="stat-label">Dars</span></div>
+    <div class="stat"><span class="stat-num">100%</span><span class="stat-label">Amaliy</span></div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="progress-section">
+    <div class="section-label">Umumiy progress</div>
+    <div class="progress-bar-wrap">
+      <div class="progress-bar" id="mainProgress"></div>
+    </div>
+    <div class="progress-labels">
+      <span id="progressText">0 ta dars bajarildi</span>
+      <span id="progressPct">0%</span>
+    </div>
+  </div>
+
+  <div class="phases">
+
+    <!-- PHASE 1 -->
+    <div class="phase open" id="phase1">
+      <div class="phase-header" onclick="togglePhase('phase1')">
+        <div class="phase-icon c-green">🟢</div>
+        <div class="phase-meta">
+          <div class="phase-title">1-Bosqich — Excel bilan tanishuv</div>
+          <div class="phase-sub">Interfeys, katak, qator, ustun, ma'lumot kiritish</div>
+        </div>
+        <div class="phase-right">
+          <span class="phase-duration">1–2 hafta</span>
+          <span class="chevron">›</span>
+        </div>
+      </div>
+      <div class="phase-body">
+        <div class="lessons">
+          <div class="lesson" onclick="toggleLesson(this)">
+            <div class="lesson-check">✓</div>
+            <div class="lesson-info">
+              <div class="lesson-name">Dars 1 — Excel nima va u nima uchun kerak?</div>
+              <div class="lesson-desc">Do'kon hisobi, maktab jadvali, oylik xarajatlar — real hayotdan misollar. O'quvchini qiziqtirish muhim.</div>
+              <div class="lesson-tags">
+                <span class="tag t-green">Kirish darsi</span>
+                <span class="tag t-muted">45 daqiqa</span>
+              </div>
+            </div>
+          </div>
+          <div class="lesson" onclick="toggleLesson(this)">
+            <div class="lesson-check">✓</div>
+            <div class="lesson-info">
+              <div class="lesson-name">Dars 2 — Interfeys bilan tanishuv</div>
+              <div class="lesson-desc">Katak (cell), qator (row), ustun (column), varaq (sheet) nima ekanligi. A1, B2 kabi manzillar.</div>
+              <div class="lesson-tags">
+                <span class="tag t-green">Nazariya</span>
+                <span class="tag t-muted">45 daqiqa</span>
+              </div>
+            </div>
+          </div>
+          <div class="lesson" onclick="toggleLesson(this)">
+            <div class="lesson-check">✓</div>
+            <div class="lesson-info">
+              <div class="lesson-name">Dars 3 — Ma'lumot kiritish va tahrirlash</div>
+              <div class="lesson-desc">Matn, son, sana kiritish. Delete, Backspace, Enter farqi. Ustun kengligini o'zgartirish.</div>
+              <div class="lesson-tags">
+                <span class="tag t-green">Amaliyot</span>
+                <span class="tag t-muted">60 daqiqa</span>
+              </div>
+            </div>
+          </div>
+          <div class="lesson" onclick="toggleLesson(this)">
+            <div class="lesson-check">✓</div>
+            <div class="lesson-info">
+              <div class="lesson-name">Dars 4 — Fayl saqlash va ochish</div>
+              <div class="lesson-desc">Ctrl+S, Ctrl+O, Ctrl+N. .xlsx format. Faylni nomlab saqlash odati.</div>
+              <div class="lesson-tags">
+                <span class="tag t-green">Amaliyot</span>
+                <span class="tag t-muted">30 daqiqa</span>
+              </div>
+            </div>
+          </div>
+          <div class="lesson" onclick="toggleLesson(this)">
+            <div class="lesson-check">✓</div>
+            <div class="lesson-info">
+              <div class="lesson-name">Mashq — Sinf jadvali yaratish</div>
+              <div class="lesson-desc">O'quvchilar ismi va telefon raqamini jadvalga kiritish. Amaliy mashq sifatida.</div>
+              <div class="lesson-tags">
+                <span class="tag t-yellow">Mashq</span>
+                <span class="tag t-muted">45 daqiqa</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tip-box">
+          💡 <strong>O'qituvchi maslahati:</strong> Birinchi darsda o'quvchilarga "bu qiyin emas" degan ishonch bering. Excel ni faqat ko'rsatmang — ular ham klaviaturani bossin!
+        </div>
+      </div>
+    </div>
+
+    <!-- PHASE 2 -->
+    <div class="phase" id="phase2">
+      <div class="phase-header" onclick="togglePhase('phase2')">
+        <div class="phase-icon c-yellow">🟡</div>
+        <div class="phase-meta">
+          <div class="phase-title">2-Bosqich — Oddiy formulalar</div>
+          <div class="phase-sub">Arifmetik amallar, SUM, AVERAGE, MAX, MIN, COUNT</div>
+        </div>
+        <div class="phase-right">
+          <span class="phase-duration">2 hafta</span>
+          <span class="chevron">›</span>
+        </div>
+      </div>
+      <div class="phase-body">
+        <div class="lessons">
+          <div class="lesson" onclick="toggleLesson(this)">
+            <div class="lesson-check">✓</div>
+            <div class="lesson-info">
+              <div class="lesson-name">Dars 5 — Formula nima? = belgisi</div>
+              <div class="lesson-desc">=5+3, =A1+B1 misollari. Formulalar har doim = bilan boshlanadi.</div>
+              <div class="lesson-tags">
+                <span class="tag t-yellow">Formulalar</span>
+                <span class="tag t-muted">45 daqiqa</span>
+              </div>
+            </div>
+          </div>
+          <div class="lesson" onclick="toggleLesson(this)">
+            <div class="lesson-check">✓</div>
+            <div class="lesson-info">
+              <div class="lesson-name">Dars 6 — SUM funksiyasi</div>
+              <div class="lesson-desc">=SUM(A1:A10) — bir necha katakni yig'ish. Do'kon kunlik daromadi misoli.</div>
+              <div class="lesson-tags">
+                <span class="tag t-yellow">Formulalar</span>
+                <span class="tag t-muted">60 daqiqa</span>
+              </div>
+            </div>
+          </div>
+          <div class="lesson" onclick="toggleLesson(this)">
+            <div class="lesson-check">✓</div>
+            <div class="lesson-info">
+              <div class="lesson-name">Dars 7 — AVERAGE, MAX, MIN</div>
+              <div class="lesson-desc">O'rtacha ball, eng yuqori/past natija. Sinfda test natijalari misoli.</div>
+              <div class="lesson-tags">
+                <span class="tag t-yellow">Formulalar</span>
+                <span class="tag t-muted">60 daqiqa</span>
+              </div>
+            </div>
+          </div>
+          <div class="lesson" onclick="toggleLesson(this)">
+            <div class="lesson-check">✓</div>
+            <div class="lesson-info">
+              <div class="lesson-name">Dars 8 — COUNT va COUNTA</div>
+              <div class="lesson-desc">Nechta son bor, nechta katak to'ldirilgan. =COUNT vs =COUNTA farqi.</div>
+              <div class="lesson-tags">
+                <span class="tag t-yellow">Formulalar</span>
+                <span class="tag t-muted">45 daqiqa</span>
+              </div>
+            </div>
+          </div>
+          <div class="lesson" onclick="toggleLesson(this)">
+            <div class="lesson-check">✓</div>
+            <div class="lesson-info">
+              <div class="lesson-name">Dars 9 — Formulalarni nusxalash</div>
+              <div class="lesson-desc">Formulani pastga sudrab nusxalash. Avtomatik o'zgarishi — A1 → A2 → A3.</div>
+              <div class="lesson-tags">
+                <span class="tag t-yellow">Amaliyot</span>
+                <span class="tag t-muted">45 daqiqa</span>
+              </div>
+            </div>
+          </div>
+          <div class="lesson" onclick="toggleLesson(this)">
+            <div class="lesson-check">✓</div>
+            <div class="lesson-info">
+              <div class="lesson-name">Mashq — Oylik xarajatlar jadvali</div>
+              <div class="lesson-desc">Oziq-ovqat, transport, kommunal to'lovlar. Umumiy jami va o'rtacha hisoblash.</div>
+              <div class="lesson-tags">
+                <span class="tag t-orange">Amaliy loyiha</span>
+                <span class="tag t-muted">90 daqiqa</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tip-box">
+          💡 <strong>O'qituvchi maslahati:</strong> Har bir formulani o'quvchi o'zi yozsin. "Ko'rish" bilan "qilish" orasida katta farq bor. Xato qilsa — bu normal, birga tuzating.
+        </div>
+      </div>
+    </div>
+
+    <!-- PHASE 3 -->
+    <div class="phase" id="phase3">
+      <div class="phase-header" onclick="togglePhase('phase3')">
+        <div class="phase-icon c-orange">🟠</div>
+        <div class="phase-meta">
+          <div class="phase-title">3-Bosqich — IF va mantiqiy formulalar</div>
+          <div class="phase-sub">Shartli hisoblash, IF, AND, OR</div>
+        </div>
+        <div class="phase-right">
+          <span class="phase-duration">1–2 hafta</span>
+          <span class="chevron">›</span>
+        </div>
+      </div>
+      <div class="phase-body">
+        <div class="lessons">
+          <div class="lesson" onclick="toggleLesson(this)">
+            <div class="lesson-check">✓</div>
+            <div class="lesson-info">
+              <div class="lesson-name">Dars 10 — IF funksiyasi</div>
+              <div class="lesson-desc">=IF(A1>=50, "O'tdi", "Qoldi") — ball 50 dan katta bo'lsa nima bo'ladi?</div>
+              <div class="lesson-tags">
+                <span class="tag t-orange">Mantiq</span>
+                <span class="tag t-muted">60 daqiqa</span>
+              </div>
+            </div>
+          </div>
+          <div class="lesson" onclick="toggleLesson(this)">
+            <div class="lesson-check">✓</div>
+            <div class="lesson-info">
+              <div class="lesson-name">Dars 11 — Ichma-ich IF</div>
+              <div class="lesson-desc">"A'lo / Yaxshi / Qoniqarli / Qoniqarsiz" — bir necha shart. Baholar jadvali.</div>
+              <div class="lesson-tags">
+                <span class="tag t-orange">Mantiq</span>
+                <span class="tag t-muted">75 daqiqa</span>
+              </div>
+            </div>
+          </div>
+          <div class="lesson" onclick="toggleLesson(this)">
+            <div class="lesson-check">✓</div>
+            <div class="lesson-info">
+              <div class="lesson-name">Dars 12 — SUMIF va COUNTIF</div>
+              <div class="lesson-desc">Faqat ma'lum shartga mos kataklar yig'indisi. "Faqat erkaklar soni" kabi.</div>
+              <div class="lesson-tags">
+                <span class="tag t-orange">Formulalar</span>
+                <span class="tag t-muted">60 daqiqa</span>
+              </div>
+            </div>
+          </div>
+          <div class="lesson" onclick="toggleLesson(this)">
+            <div class="lesson-check">✓</div>
+            <div class="lesson-info">
+              <div class="lesson-name">Mashq — Talabalar bahosi jadvali</div>
+              <div class="lesson-desc">20 ta talaba ismi, 3 ta imtihon bali, o'rtacha, baho va natija avtomatik.</div>
+              <div class="lesson-tags">
+                <span class="tag t-orange">Amaliy loyiha</span>
+                <span class="tag t-muted">90 daqiqa</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tip-box">
+          💡 <strong>O'qituvchi maslahati:</strong> IF ni tushuntirish uchun hayotdan misol: "Agar yomg'ir yog'sa — soyabon ol, aks holda olma." Shu analogiyadan boshlang.
+        </div>
+      </div>
+    </div>
+
+    <!-- PHASE 4 -->
+    <div class="phase" id="phase4">
+      <div class="phase-header" onclick="togglePhase('phase4')">
+        <div class="phase-icon c-blue">🔵</div>
+        <div class="phase-meta">
+          <div class="phase-title">4-Bosqich — Formatlash va dizayn</div>
+          <div class="phase-sub">Ranglar, chegara, chiroyli jadval, chop etish</div>
+        </div>
+        <div class="phase-right">
+          <span class="phase-duration">1 hafta</span>
+          <span class="chevron">›</span>
+        </div>
+      </div>
+      <div class="phase-body">
+        <div class="lessons">
+          <div class="lesson" onclick="toggleLesson(this)">
+            <div class="lesson-check">✓</div>
+            <div class="lesson-info">
+              <div class="lesson-name">Dars 13 — Shrift va rang</div>
+              <div class="lesson-desc">Bold, italic, kattalashtirish. Katak fon rangi, matn rangi. Sarlavha ajratish.</div>
+              <div class="lesson-tags">
+                <span class="tag t-blue">Dizayn</span>
+                <span class="tag t-muted">45 daqiqa</span>
+              </div>
+            </div>
+          </div>
+          <div class="lesson" onclick="toggleLesson(this)">
+            <div class="lesson-check">✓</div>
+            <div class="lesson-info">
+              <div class="lesson-name">Dars 14 — Chegara va birlashtirish</div>
+              <div class="lesson-desc">Katak chegarasi chizish. Merge & Center — sarlavhani bir necha ustunga yoyish.</div>
+              <div class="lesson-tags">
+                <span class="tag t-blue">Dizayn</span>
+                <span class="tag t-muted">45 daqiqa</span>
+              </div>
+            </div>
+          </div>
+          <div class="lesson" onclick="toggleLesson(this)">
+            <div class="lesson-check">✓</div>
+            <div class="lesson-info">
+              <div class="lesson-name">Dars 15 — Sonlar formati</div>
+              <div class="lesson-desc">Pul formati (1 000 so'm), foiz (25%), sana (01.01.2024). Raqamni chiroyli ko'rsatish.</div>
+              <div class="lesson-tags">
+                <span class="tag t-blue">Format</span>
+                <span class="tag t-muted">45 daqiqa</span>
+              </div>
+            </div>
+          </div>
+          <div class="lesson" onclick="toggleLesson(this)">
+            <div class="lesson-check">✓</div>
+            <div class="lesson-info">
+              <div class="lesson-name">Dars 16 — Chop etish sozlamalari</div>
+              <div class="lesson-desc">Print Preview, sahifa yo'nalishi, A4 ga sig'dirish. Sarlavhani har sahifada takrorlash.</div>
+              <div class="lesson-tags">
+                <span class="tag t-blue">Amaliyot</span>
+                <span class="tag t-muted">45 daqiqa</span>
+              </div>
+            </div>
+          </div>
+          <div class="lesson" onclick="toggleLesson(this)">
+            <div class="lesson-check">✓</div>
+            <div class="lesson-info">
+              <div class="lesson-name">Mashq — Professional hisobot jadvali</div>
+              <div class="lesson-desc">Avvalgi mashq jadvalini chiroyli qilish: ranglar, chegara, logo uchun joy, chop tayyor.</div>
+              <div class="lesson-tags">
+                <span class="tag t-orange">Amaliy loyiha</span>
+                <span class="tag t-muted">90 daqiqa</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tip-box">
+          💡 <strong>O'qituvchi maslahati:</strong> Formatlash darsi juda qiziq o'tadi — o'quvchilar ko'rgulik natija chiqarishni yaxshi ko'radi. Tanlov o'yini o'ynang: "Kim chiroyliroq jadval yaratadi?"
+        </div>
+      </div>
+    </div>
+
+    <!-- PHASE 5 -->
+    <div class="phase" id="phase5">
+      <div class="phase-header" onclick="togglePhase('phase5')">
+        <div class="phase-icon c-purple">🟣</div>
+        <div class="phase-meta">
+          <div class="phase-title">5-Bosqich — Diagramma va yakuniy loyiha</div>
+          <div class="phase-sub">Grafik, diagramma, to'liq amaliy loyiha</div>
+        </div>
+        <div class="phase-right">
+          <span class="phase-duration">1 hafta</span>
+          <span class="chevron">›</span>
+        </div>
+      </div>
+      <div class="phase-body">
+        <div class="lessons">
+          <div class="lesson" onclick="toggleLesson(this)">
+            <div class="lesson-check">✓</div>
+            <div class="lesson-info">
+              <div class="lesson-name">Dars 17 — Diagramma nima?</div>
+              <div class="lesson-desc">Ma'lumotni vizual ko'rsatish. Ustunli, doiraviy, chiziqli diagram turlari.</div>
+              <div class="lesson-tags">
+                <span class="tag t-purple">Vizualizatsiya</span>
+                <span class="tag t-muted">45 daqiqa</span>
+              </div>
+            </div>
+          </div>
+          <div class="lesson" onclick="toggleLesson(this)">
+            <div class="lesson-check">✓</div>
+            <div class="lesson-info">
+              <div class="lesson-name">Dars 18 — Diagramma yaratish</div>
+              <div class="lesson-desc">Ma'lumotni ajratib → Insert → Chart. Sarlavha, rang, o'q nomlari qo'shish.</div>
+              <div class="lesson-tags">
+                <span class="tag t-purple">Amaliyot</span>
+                <span class="tag t-muted">75 daqiqa</span>
+              </div>
+            </div>
+          </div>
+          <div class="lesson" onclick="toggleLesson(this)">
+            <div class="lesson-check">✓</div>
+            <div class="lesson-info">
+              <div class="lesson-name">Dars 19 — Saralash va filtr</div>
+              <div class="lesson-desc">Ma'lumotni A→Z saralash. AutoFilter bilan kerakli yozuvlarni tezda topish.</div>
+              <div class="lesson-tags">
+                <span class="tag t-purple">Amaliyot</span>
+                <span class="tag t-muted">45 daqiqa</span>
+              </div>
+            </div>
+          </div>
+          <div class="lesson" onclick="toggleLesson(this)">
+            <div class="lesson-check">✓</div>
+            <div class="lesson-info">
+              <div class="lesson-name">🏆 Yakuniy Loyiha — Do'kon hisobi</div>
+              <div class="lesson-desc">Tovarlar ro'yxati, narxi, soni, jami, oylik daromad, diagramma, chop tayyor PDF.</div>
+              <div class="lesson-tags">
+                <span class="tag t-purple">Yakuniy imtihon</span>
+                <span class="tag t-muted">2 soat</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="tip-box">
+          💡 <strong>O'qituvchi maslahati:</strong> Yakuniy loyihada o'quvchiga real topshiriq bering — o'z oilasi uchun oylik byudjet, yoki o'z do'konining hisob kitobi. Shunda motivatsiya yuqori bo'ladi!
+        </div>
+      </div>
+    </div>
+
+  </div><!-- end phases -->
+
+  <div class="footer-note">
+    <p>Barcha <span>28+ dars</span> muvaffaqiyatli tugallangach — o'quvchilaringiz Excel ni kundalik hayotda ishlatish uchun tayyor bo'ladi 🎉</p>
+    <p style="margin-top:8px; font-size:11px; color:#555;">Tayyorladi: Claude AI · 2025</p>
+  </div>
+
+</div><!-- end container -->
+
+<script>
+  function togglePhase(id) {
+    const el = document.getElementById(id);
+    el.classList.toggle('open');
+  }
+
+  function toggleLesson(el) {
+    el.classList.toggle('done');
+    updateProgress();
+  }
+
+  function updateProgress() {
+    const all = document.querySelectorAll('.lesson').length;
+    const done = document.querySelectorAll('.lesson.done').length;
+    const pct = Math.round((done / all) * 100);
+    document.getElementById('mainProgress').style.width = pct + '%';
+    document.getElementById('progressText').textContent = done + ' ta dars bajarildi';
+    document.getElementById('progressPct').textContent = pct + '%';
+  }
+
+  // Animate progress bar on load
+  setTimeout(() => updateProgress(), 300);
+</script>
+</body>
+</html>
